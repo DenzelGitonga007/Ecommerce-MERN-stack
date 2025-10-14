@@ -35,8 +35,8 @@ mongoose.connect("mongodb://localhost:27017/simpleEcom", {
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/products");
 
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
+app.use("/simple-ecom/auth", authRoutes); // use the auth routes
+app.use("/simple-ecom/products", productRoutes);
 
 // ----------------------------
 // START SERVER
