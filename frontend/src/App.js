@@ -1,141 +1,108 @@
 // src/App.js
 // ---------------------------------------------
-// 🛒 Simple E-commerce + PayPal Payment Integration
+// 🛒 Simple E-commerce + PayPal + M-Pesa
 // ---------------------------------------------
-
-// Step 1: Install PayPal’s React SDK
-
-// Run this in your frontend folder (the same one with src):
-
-// >> npm install @paypal/react-paypal-js
-
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-// Import PayPal components
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 function App() {
-  // 🧠 State to store list of products
   const [products, setProducts] = useState([]);
-
-  // 🧠 State to store new product form data
   const [form, setForm] = useState({ name: "", price: "", description: "" });
 
-  // 📦 Load all products when the page first opens
+  // ✅ Load products when the app starts
   useEffect(() => {
     axios
       .get("http://localhost:5000/simple-ecom/products")
-      .then((res) => setProducts(res.data)) // set the list of products from backend
-      .catch((err) => console.log(err)); // print any error in console
+      .then((res) => setProducts(res.data))
+      .catch((err) => console.log(err));
   }, []);
 
-  // ✏️ When user types in the input boxes
+  // ✏️ Handle form typing
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value }); // update the correct field
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ➕ Add a new product to the backend
+  // ➕ Add new product
   const addProduct = () => {
     axios
       .post("http://localhost:5000/simple-ecom/products", form)
       .then(() => {
         alert("✅ Product added!");
-        window.location.reload(); // refresh the product list
+        window.location.reload();
       })
       .catch(() => alert("❌ Error adding product"));
   };
 
+  // 📲 M-Pesa payment handler
+  const payWithMpesa = (price) => {
+    axios
+      .post("http://localhost:5000/mpesa/stkpush", {
+        phone: "254720245837", // your number in format 2547xxxxxxx
+        amount: price,
+      })
+      .then(() => alert("📲 STK Push sent! Check your phone."))
+      .catch((err) => {
+        console.error("STK Push Error:", err.response ? err.response.data : err.message);
+        alert("❌ Error sending STK push — check console for details");
+      });
+  };
+
   return (
-    // 🟢 Step 1: Wrap the entire app with PayPalScriptProvider
-    // This loads PayPal SDK (the system that allows payments)
     <PayPalScriptProvider
       options={{
-        // "client-id": "YOUR_SANDBOX_CLIENT_ID_HERE", // 👈 replace with your sandbox ID
-        "client-id": "AVdEVIGs2EVyUNKGM_P6dHfNE1zPuTfx_ruYUD_Yqvzgj-m_9pfQArYd1DrxBq4YEvMxxUZnJcU5bku4", // 👈 replace with your sandbox ID
-        currency: "USD", // or "EUR", "KES", etc.
+        "client-id": "AVdEVIGs2EVyUNKGM_P6dHfNE1zPuTfx_ruYUD_Yqvzgj-m_9pfQArYd1DrxBq4YEvMxxUZnJcU5bku4",
+        currency: "USD",
       }}
     >
-      <div style={{ padding: "20px" }}>
+      <div style={{ padding: 20 }}>
         <h2>🛍 Simple E-commerce Demo</h2>
 
-        {/* 🧾 Product form for adding new products */}
-        <div style={{ marginBottom: "20px" }}>
-          <input
-            name="name"
-            placeholder="Product Name"
-            onChange={handleChange}
-            style={{ marginRight: "10px" }}
-          />
-          <input
-            name="price"
-            placeholder="Price"
-            onChange={handleChange}
-            style={{ marginRight: "10px" }}
-          />
-          <input
-            name="description"
-            placeholder="Description"
-            onChange={handleChange}
-            style={{ marginRight: "10px" }}
-          />
+        {/* 🧾 Add Product Form */}
+        <div style={{ marginBottom: 20 }}>
+          <input name="name" placeholder="Product Name" onChange={handleChange} />
+          <input name="price" placeholder="Price" onChange={handleChange} />
+          <input name="description" placeholder="Description" onChange={handleChange} />
           <button onClick={addProduct}>Add Product</button>
         </div>
 
         <hr />
 
-        {/* 🧩 Step 2: Display all products */}
-        <h3>🧾 All Products</h3>
+        {/* 🧾 Show all products */}
+        <h3>Products</h3>
         <ul style={{ listStyleType: "none", padding: 0 }}>
           {products.map((p) => (
-            <li
-              key={p._id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "15px",
-                marginBottom: "15px",
-                borderRadius: "10px",
-              }}
-            >
-              {/* Show basic product info */}
+            <li key={p._id} style={{ border: "1px solid #ccc", padding: 15, borderRadius: 10, marginBottom: 10 }}>
               <b>{p.name}</b> - ${p.price}
               <br />
               <small>{p.description}</small>
               <br />
               <br />
 
-              {/* 💳 Step 3: PayPal button for each product */}
+              {/* 💳 Pay with PayPal */}
               <PayPalButtons
-                // When user clicks PayPal button
-                createOrder={(data, actions) => {
-                  // Tell PayPal what product (and price) they are buying
-                  return actions.order.create({
-                    purchase_units: [
-                      {
-                        description: p.name, // Product name
-                        amount: {
-                          value: p.price, // Product price
-                        },
-                      },
-                    ],
-                  });
-                }}
-                // When payment is approved successfully
-                onApprove={(data, actions) => {
-                  return actions.order.capture().then((details) => {
-                    alert("✅ Payment successful! Thank you, " + details.payer.name.given_name);
-                    console.log("Payment details:", details);
-                  });
-                }}
-
-                // If something goes wrong
+                createOrder={(data, actions) =>
+                  actions.order.create({
+                    purchase_units: [{ description: p.name, amount: { value: p.price } }],
+                  })
+                }
+                onApprove={(data, actions) =>
+                  actions.order.capture().then((details) => {
+                    alert(`✅ PayPal payment successful! Thank you, ${details.payer.name.given_name}`);
+                  })
+                }
                 onError={(err) => {
                   console.error(err);
-                  alert("❌ Payment failed. Please try again.");
+                  alert("❌ PayPal Payment failed!");
                 }}
               />
+
+              {/* 💰 Pay with M-Pesa */}
+              <button onClick={() => payWithMpesa(p.price)}>💰 Pay with M-Pesa</button>
+            
             </li>
+            
           ))}
         </ul>
       </div>

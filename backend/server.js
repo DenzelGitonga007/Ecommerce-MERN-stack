@@ -38,6 +38,12 @@ const productRoutes = require("./routes/products");
 app.use("/simple-ecom/auth", authRoutes); // use the auth routes
 app.use("/simple-ecom/products", productRoutes);
 
+
+// The mpesa route
+const mpesaRoutes = require("./routes/mpesa_stk");
+app.use("/mpesa", mpesaRoutes);
+
+
 // ----------------------------
 // START SERVER
 // ----------------------------
