@@ -39,7 +39,7 @@ function App() {
   const payWithMpesa = (price) => {
     axios
       .post("http://localhost:5000/mpesa/stkpush", {
-        phone: "254720245837", // your number in format 2547xxxxxxx
+        phone: "254712334444", // your number in format 2547xxxxxxx
         amount: price,
       })
       .then(() => alert("📲 STK Push sent! Check your phone."))
