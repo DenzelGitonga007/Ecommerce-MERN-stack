@@ -28,7 +28,7 @@ function App() {
   // ➕ Add new product
   const addProduct = () => {
     axios
-      .post("http://localhost:5000/simple-ecom/products", form)
+      .post("https://ecommerce-mern-stack-backend-5t41.onrender.com/simple-ecom/products", form)
       .then(() => {
         alert("✅ Product added!");
         window.location.reload();
