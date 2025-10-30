@@ -21,7 +21,12 @@ app.use(bodyParser.json());      // parse incoming JSON data
 // CONNECT TO MONGODB
 // ----------------------------
 // (Make sure MongoDB is running locally or use MongoDB Atlas)
-mongoose.connect("mongodb://localhost:27017/simpleEcom", {
+
+// simpleEcomAdmin
+// simpleEcomAdmin123!
+// mongodb+srv://simpleEcomAdmin:simpleEcomAdmin123!@simpleecom.npduwaz.mongodb.net/?appName=simpleEcom
+
+mongoose.connect("mongodb+srv://simpleEcomAdmin:simpleEcomAdmin123!@simpleecom.npduwaz.mongodb.net/?appName=simpleEcom", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
