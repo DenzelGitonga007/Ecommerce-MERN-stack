@@ -42,7 +42,7 @@ function App() {
 
         phone: "254712334444", // your number in format 2547xxxxxxx
 
-        phone: "254794290546", // your number in format 2547xxxxxxx
+        // phone: "254794290546", // your number in format 2547xxxxxxx
 
         amount: price,
       })
