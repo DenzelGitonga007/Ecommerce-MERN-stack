@@ -14,7 +14,8 @@ function App() {
   // ✅ Load products when the app starts
   useEffect(() => {
     axios
-      .get("http://localhost:5000/simple-ecom/products")
+      // .get("http://localhost:5000/simple-ecom/products") // for developmen
+      .get("https://ecommerce-mern-stack-backend-5t41.onrender.com/simple-ecom/products") // for production
       .then((res) => setProducts(res.data))
       .catch((err) => console.log(err));
   }, []);
